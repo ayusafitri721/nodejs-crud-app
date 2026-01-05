@@ -1,73 +1,72 @@
 const User = require("../models/userModel");
 
-// Get all users
-exports.getAllUsers = async (req, res) => {
+// Tampilkan semua users
+exports.showUsers = async (req, res) => {
   try {
     const users = await User.findAll();
-    res.status(200).json({
-      success: true,
-      data: users,
+    res.render("users", {
+      users: users,
+      message: req.query.message || null,
+      error: req.query.error || null,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error fetching users",
-      error: error.message,
+    res.render("users", {
+      users: [],
+      message: null,
+      error: "Gagal memuat data: " + error.message,
     });
   }
 };
 
-// Get user by ID
-exports.getUserById = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: user,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error fetching user",
-      error: error.message,
-    });
-  }
+// Tampilkan form tambah user
+exports.showAddForm = (req, res) => {
+  res.render("form", {
+    title: "Tambah User Baru",
+    user: null,
+    error: null,
+  });
 };
 
-// Create new user
+// Create user
 exports.createUser = async (req, res) => {
   try {
     const { name, email, phone } = req.body;
 
-    // Validation
     if (!name || !email) {
-      return res.status(400).json({
-        success: false,
-        message: "Name and email are required",
+      return res.render("form", {
+        title: "Tambah User Baru",
+        user: req.body,
+        error: "Nama dan email wajib diisi!",
       });
     }
 
-    const userId = await User.create({ name, email, phone });
+    await User.create({ name, email, phone });
+    res.redirect("/?message=User berhasil ditambahkan");
+  } catch (error) {
+    res.render("form", {
+      title: "Tambah User Baru",
+      user: req.body,
+      error: "Gagal menambahkan user: " + error.message,
+    });
+  }
+};
 
-    res.status(201).json({
-      success: true,
-      message: "User created successfully",
-      data: { id: userId, name, email, phone },
+// Tampilkan form edit user
+exports.showEditForm = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.redirect("/?error=User tidak ditemukan");
+    }
+
+    res.render("form", {
+      title: "Edit User",
+      user: user,
+      error: null,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error creating user",
-      error: error.message,
-    });
+    res.redirect("/?error=Gagal memuat data user");
   }
 };
 
@@ -77,35 +76,24 @@ exports.updateUser = async (req, res) => {
     const { name, email, phone } = req.body;
     const userId = req.params.id;
 
-    // Check if user exists
+    if (!name || !email) {
+      const user = await User.findById(userId);
+      return res.render("form", {
+        title: "Edit User",
+        user: { id: userId, name, email, phone },
+        error: "Nama dan email wajib diisi!",
+      });
+    }
+
     const existingUser = await User.findById(userId);
     if (!existingUser) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+      return res.redirect("/?error=User tidak ditemukan");
     }
 
-    const affectedRows = await User.update(userId, { name, email, phone });
-
-    if (affectedRows === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No changes made",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "User updated successfully",
-      data: { id: userId, name, email, phone },
-    });
+    await User.update(userId, { name, email, phone });
+    res.redirect("/?message=User berhasil diupdate");
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error updating user",
-      error: error.message,
-    });
+    res.redirect("/?error=Gagal mengupdate user");
   }
 };
 
@@ -114,26 +102,14 @@ exports.deleteUser = async (req, res) => {
   try {
     const userId = req.params.id;
 
-    // Check if user exists
     const existingUser = await User.findById(userId);
     if (!existingUser) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+      return res.redirect("/?error=User tidak ditemukan");
     }
 
     await User.delete(userId);
-
-    res.status(200).json({
-      success: true,
-      message: "User deleted successfully",
-    });
+    res.redirect("/?message=User berhasil dihapus");
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error deleting user",
-      error: error.message,
-    });
+    res.redirect("/?error=Gagal menghapus user");
   }
 };

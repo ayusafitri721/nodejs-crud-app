@@ -1,0 +1,65 @@
+<%- include('partials/header', { title: 'Daftar User' }) %>
+
+<div class="content">
+    <!-- Message Success/Error -->
+    <% if (message) { %>
+        <div class="alert alert-success">
+            <%= message %>
+        </div>
+    <% } %>
+    
+    <% if (error) { %>
+        <div class="alert alert-error">
+            <%= error %>
+        </div>
+    <% } %>
+
+    <!-- Button Tambah -->
+    <div class="action-bar">
+        <a href="/add" class="btn btn-primary">+ Tambah User Baru</a>
+    </div>
+
+    <!-- Table Users -->
+    <div class="table-section">
+        <h2>Daftar User</h2>
+        
+        <% if (users.length > 0) { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nama</th>
+                        <th>Email</th>
+                        <th>Telepon</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(user => { %>
+                    <tr>
+                        <td><%= user.id %></td>
+                        <td><%= user.name %></td>
+                        <td><%= user.email %></td>
+                        <td><%= user.phone || '-' %></td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="/edit/<%= user.id %>" class="btn btn-edit">Edit</a>
+                                <form action="/delete/<%= user.id %>" method="POST" style="display: inline;" 
+                                      onsubmit="return confirm('Yakin ingin menghapus user ini?')">
+                                    <button type="submit" class="btn btn-delete">Hapus</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <div class="empty-state">
+                <p>Belum ada data user. Silakan tambah user baru.</p>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

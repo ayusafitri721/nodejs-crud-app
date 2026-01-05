@@ -2,11 +2,18 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
 
-// Define routes
-router.get("/", userController.getAllUsers);
-router.get("/:id", userController.getUserById);
-router.post("/", userController.createUser);
-router.put("/:id", userController.updateUser);
-router.delete("/:id", userController.deleteUser);
+// Halaman utama - tampilkan semua users
+router.get("/", userController.showUsers);
+
+// Form tambah user
+router.get("/add", userController.showAddForm);
+router.post("/add", userController.createUser);
+
+// Form edit user
+router.get("/edit/:id", userController.showEditForm);
+router.post("/edit/:id", userController.updateUser);
+
+// Delete user
+router.post("/delete/:id", userController.deleteUser);
 
 module.exports = router;
