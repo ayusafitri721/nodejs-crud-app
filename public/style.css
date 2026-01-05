@@ -140,12 +140,16 @@ input:focus {
 }
 
 .btn-edit {
-    background-color: #17a2b8;
+    background-color: #1C4D8D;
     color: white;
-    padding: 8px 0;
+    padding: 8px 16px;
     font-size: 13px;
     width: 70px;
+    height: 36px;
     text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-edit:hover {
@@ -155,10 +159,14 @@ input:focus {
 .btn-delete {
     background-color: #dc3545;
     color: white;
-    padding: 8px 0;
+    padding: 8px 16px;
     font-size: 13px;
     width: 70px;
+    height: 36px;
     text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-delete:hover {
